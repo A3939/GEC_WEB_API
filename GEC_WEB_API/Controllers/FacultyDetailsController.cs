@@ -3,30 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GEC_WEB_API.Controllers
 {
-    [Route("api/[controller]")]
+   // [Route("api/[controller]")]
     [ApiController]
     public class FacultyDetailsController : ControllerBase
     {
-        private static List<FacultyDetails> Faculty = new List<FacultyDetails>
-            {
-                new FacultyDetails
-                {
-                    Id = 1,
-                    Name = "Aditya Patel",
-                    DeptId = 300,
-                    DesignationId = 100,
-                    //IsDeleted = false
-                },
-                new FacultyDetails
-                {
-                    Id = 2,
-                    Name = "Ojas Patel",
-                    DeptId = 300,
-                    DesignationId = 100,
-                    //IsDeleted = false
-                }
-            };
-
         private readonly DataContext _context;
 
         public FacultyDetailsController(DataContext context)
@@ -35,6 +15,7 @@ namespace GEC_WEB_API.Controllers
         }
 
         [HttpGet]
+        [Route("FacultyList")]
         public async Task<ActionResult<List<FacultyDetails>>> Get()
         {
             return Ok(await _context.FacultyDetail.ToListAsync());
@@ -42,6 +23,7 @@ namespace GEC_WEB_API.Controllers
 
 
         [HttpPost]
+        [Route("FacultyAdd")]
         public async Task<ActionResult<List<FacultyDetails>>> AddFaculty(FacultyDetails FacultyDetail)
         {
             _context.FacultyDetail.Add(FacultyDetail);
@@ -50,6 +32,7 @@ namespace GEC_WEB_API.Controllers
         }
 
         [HttpPut]
+        [Route("FacultyEdit")]
         public async Task<ActionResult<List<FacultyDetails>>> UpdateFaculty(FacultyDetails FacultyDetails)
         {
             var FacultyId = await _context.FacultyDetail.FindAsync(FacultyDetails.Id);
@@ -67,18 +50,21 @@ namespace GEC_WEB_API.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(Faculty);
+            return Ok(await _context.FacultyDetail.ToListAsync());
         }
 
         [HttpDelete]
+        [Route("FacultyDelete")]
         public async Task<ActionResult<List<FacultyDetails>>> Delete(int id)
         {
-            var FacultyId = Faculty.Find(f => f.Id == id);
+            var FacultyId = await _context.FacultyDetail.FindAsync(id);
             if (FacultyId == null)
                 return BadRequest("Not Found");
 
-            Faculty.Remove(FacultyId);
-            return Ok(Faculty);
+            _context.FacultyDetail.Remove(FacultyId);
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.FacultyDetail.ToListAsync());
         }
 
     }
